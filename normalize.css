@@ -1,0 +1,99 @@
+/* Стили для формы и кнопки */
+.search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+input {
+    font-family: "Rubik", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--base-color);
+}
+
+.search__input {
+    height: 31px;
+    width: 300px;
+    outline: none;
+    border: 2px solid var(--base-color);
+    border-radius: 12px;
+    padding-left: 35px;
+}
+
+.search__input::placeholder {
+    color: var(--secondary-background-color);
+}
+
+.search__icon {
+    position: absolute;
+    left: 10px;
+}
+
+.suggestion-list {
+    list-style-type: none;
+    padding: 0;
+    top: 40px;
+    background-color: var(--secondary-background-color);
+    position: absolute;
+    width: 100%;
+    z-index: 100;
+}
+
+.suggestion-list li {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.suggestion-list li:hover,
+.suggestion-list li.active{
+    background-color: var(--secondary-color);
+}
+
+.toggle-btn {
+    position: relative;
+    padding: 5px 10px 7px;
+    background-color: transparent;
+    color: var(--secondary-color);
+    font-family: "Rubik", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.toggle-btn::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    opacity: 0;
+    background-color: var(--secondary-color);
+    border-radius: 1px;
+    transition: opacity 0.2s ease;
+}
+
+.toggle-btn:hover::after {
+    opacity: 100%;
+}
+
+.toggle-btn._active {
+    opacity: 100%;
+}
+
+@media (max-width: 950px) {
+    .search__input {
+        width: 200px;
+    }
+    .toggle-btn {
+        transition: color ease 0.3s;
+    }
+    .toggle-btn::after {
+        display: none;
+    }
+    .toggle-btn:focus {
+        color: var(--base-color);
+    }
+}

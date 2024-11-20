@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Inter:wght@100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="header">
+    <div class="header__container container">
+        <a href="#" class="logo">
+            <h3 class="header__text">Weather</h3>
+        </a>
+        <div class="header__menu menu">
+            <div class="location">
+                <img class="location__icon" src="img/location.svg" alt="location">
+                <h3 class="location__name"></h3>
+            </div>
+            <div class="search">
+                <svg class="search__icon" width="20" height="25" viewBox="0 0 20 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="8.5" cy="11.5" r="5.75" stroke="#A7BFF3" stroke-width="1.5"/>
+                        <path d="M13 16L17.2426 20.2426" stroke="#A7BFF3" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <input class="search__input city-search-input" type="text" placeholder="Поиск города" style="caret-color: var(--base-color)">
+                <ul class="suggestion-list"></ul>
+            </div>
+            <div class="date"><p class="date__name"></p></div>
+        </div>
+    </div>
+</header>
+<main class="main hidden">
+    <div class="main__container container">
+        <div class="current-weather">
+            <h3 class="current-weather__title">Погода сейчас</h3>
+            <div class="current-weather__details">
+                <div class="current-weather__info">
+                    <h1 class="current-weather__weather-status weatherStatus"></h1>
+                    <h3 class="current-weather__feels-like">ощущается как <span class="feels-like"></span> °C</h3>
+                </div>
+                <div class="current-weather__visualisation">
+                    <p class="current-weather__temp"><span class="temp"></span><span class="current-weather__temp-unit">°C</span></p>
+                    <img class="current-weather__icon weatherIcon" src="" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="weather-info">
+            <div class="weather-info__item">
+                <img class="weather-info__icon" src="img/wind.svg" alt="weather">
+                <div class="weather-info__data">
+                    <p class="weather-info__label">Ветер</p>
+                    <h2 class="weather-info__value"><span class="wind"></span></h2>
+                </div>
+            </div>
+            <div class="weather-info__item">
+                <img class="weather-info__icon" src="img/humidity.svg" alt="weather">
+                <div class="weather-info__data">
+                    <p class="weather-info__label">Влажность</p>
+                    <h2 class="weather-info__value"><span class="humidity"></span></h2>
+                </div>
+            </div>
+            <div class="weather-info__item">
+                <img class="weather-info__icon" src="img/pressure.svg" alt="weather">
+                <div class="weather-info__data">
+                    <p class="weather-info__label">Давление</p>
+                    <h2 class="weather-info__value"><span class="pressure"></span></h2>
+                </div>
+            </div>
+        </div>
+        <div class="cities">
+            <h3 class="cities__title">Недавние города</h3>
+        </div>
+        <div class="forecast-panel">
+            <div class="forecast-panel__toggle">
+                <button class="toggle-btn day-btn"><h3>Сутки</h3></button>
+                <button class="toggle-btn week-btn"><h3>5 дней</h3></button>
+            </div>
+            <div class="forecast-panel__viewport">
+                <div class="forecast-panel__content">
+                    <div class="cards">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="index.js"></script>
+</body>
+</html>
