@@ -396,7 +396,7 @@ function renderCities(cities) {
                 </div>
                 <div class="cities__wrapper_temp">
                     <h2>${city.temperature} °C</h2>
-                    <img src="img/weather/${weatherImage}.svg" alt="${weatherImage}" height="66px" width="90px">
+                    <img src="img/weather/${weatherImage}.svg" alt="${weatherImage}" height="41px" width="50px">
                 </div>`
         citiesWrapper.append(cityContent)
     }
