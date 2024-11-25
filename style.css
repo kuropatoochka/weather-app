@@ -425,6 +425,7 @@ body._light{
     .card-wrapper {
         padding: 0 15px;
         min-width: 110px;
+        justify-content: center;
     }
     .card__info {
         align-items: center;
