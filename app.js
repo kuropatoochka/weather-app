@@ -1,4 +1,4 @@
-import {dateConstants, selectors, fetchCitySuggestions, loadCurrentWeather, loadForecastWeather, getWeatherIcon} from "./components";
+import {dateConstants, selectors, fetchCitySuggestions, loadCurrentWeather, loadForecastWeather, getWeatherIcon} from "./components/index.js";
 let currentIcon = null
 let forecastWeatherData = null
 let currentType = 'hour'
