@@ -50,12 +50,18 @@ function updateActiveItem(items) {
 
 async function handleCitySearch(query) {
     const cities = await fetchCitySuggestions(query)
-    for (let city of cities) {
-        if (city.local_names?.ru) {
-            const suggestionItem = document.createElement("li")
-            suggestionItem.textContent = `${city.local_names.ru}, ${city.country}`
-            selectors.suggestionList.appendChild(suggestionItem)
-            suggestionItem.onclick = () => handleCitySection(city.lat, city.lon)
+    if (cities.length === 0) {
+        const suggestionItem = document.createElement("li")
+        suggestionItem.textContent = `Город не найден`
+        selectors.suggestionList.appendChild(suggestionItem)
+    } else {
+        for (let city of cities) {
+            if (city.local_names?.ru) {
+                const suggestionItem = document.createElement("li")
+                suggestionItem.textContent = `${city.local_names.ru}, ${city.country}`
+                selectors.suggestionList.appendChild(suggestionItem)
+                suggestionItem.onclick = () => handleCitySection(city.lat, city.lon)
+            }
         }
     }
 }
@@ -235,13 +241,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function findLocation() {
     if (!navigator.geolocation) {
-        console.log('Не поддерживается geolocation')
+        error()
     } else {
-        navigator.geolocation.getCurrentPosition(success)
+        navigator.geolocation.watchPosition(success, error)
     }
     async function success(position) {
         const { latitude, longitude } = position.coords;
         await handleCitySection(latitude, longitude);
+    }
+    async function error() {
+        const defaultCityLat = '55.7505'
+        const defaultCityLon = '37.6175'
+        await  handleCitySection(defaultCityLat, defaultCityLon)
     }
 }
 
