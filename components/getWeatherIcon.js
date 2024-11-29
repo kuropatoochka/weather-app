@@ -4,7 +4,7 @@ export function getWeatherIcon(iconStatus, iconId) {
             return 'stormy'
         case 'Drizzle':
             return 'rainy'
-        case 'Rainy':
+        case 'Rain':
             return 'rainy'
         case 'Snow':
             return 'snowy'
@@ -13,7 +13,7 @@ export function getWeatherIcon(iconStatus, iconId) {
         case 'Clear':
             return 'sunny'
         case 'Clouds':
-            return iconId === 801 ? 'cloudySunny' : 'cloudy'
+            return (iconId === 801) ? 'cloudySunny' : 'cloudy'
         default:
             return 'cloudy'
     }

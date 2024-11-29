@@ -79,7 +79,7 @@ input {
     opacity: 100%;
 }
 
-.toggle-btn._active {
+.toggle-btn::after._active {
     opacity: 100%;
 }
 
@@ -93,7 +93,10 @@ input {
     .toggle-btn::after {
         display: none;
     }
-    .toggle-btn:focus {
+    .toggle-btn._light._active {
         color: var(--base-color);
+    }
+    .toggle-btn._dark._active {
+        color: var(--secondary-background-color);
     }
 }

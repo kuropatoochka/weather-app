@@ -54,8 +54,8 @@ async function handleCitySearch(query) {
         if (city.local_names?.ru) {
             const suggestionItem = document.createElement("li")
             suggestionItem.textContent = `${city.local_names.ru}, ${city.country}`
-            suggestionItem.onclick = () => handleCitySection(city.lat, city.lon)
             selectors.suggestionList.appendChild(suggestionItem)
+            suggestionItem.onclick = () => handleCitySection(city.lat, city.lon)
         }
     }
 }
@@ -106,14 +106,17 @@ function fetchCurrentWeatherData(data) {
 function changeBackground(icon) {
     const panel = document.querySelector('.forecast-panel')
     const textContentChanges = document.querySelectorAll('.location__name, .current-weather__temp, .current-weather__feels-like')
+    const buttonsColor = document.querySelectorAll('.toggle-btn')
     const body = document.body
     const isTouchDevice = document.body.classList.contains('_touch')
     panel.classList.remove('_light', '_dark')
     body.classList.remove('_light', '_dark')
     textContentChanges.forEach(text => text.classList.remove('_dark'))
+    buttonsColor.forEach(button => button.classList.remove('_dark'))
     if (icon === 'sunny' || icon === 'cloudySunny' || icon === 'cloudy') {
         if (isTouchDevice) {
             body.classList.add('_light')
+            buttonsColor.forEach(button => button.classList.add('_light'))
         } else {
             panel.classList.add('_light')
         }
@@ -121,6 +124,7 @@ function changeBackground(icon) {
         if (isTouchDevice) {
             body.classList.add('_dark')
             textContentChanges.forEach(text => text.classList.add('_dark'))
+            buttonsColor.forEach(button => button.classList.add('_dark'))
         } else {
             panel.classList.add('_dark')
         }
@@ -226,20 +230,18 @@ function createWeatherCard(item, type) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const isFirstVisit = (window.localStorage.length === 0)
-    if (isFirstVisit) {
-        findLocation()
-    } else {
-        loadSavedCities()
-    }
+    findLocation()
 })
 
-function loadSavedCities() {
-    const savedCities = JSON.parse(localStorage.getItem('cities')) || []
-    if (savedCities.length > 0) {
-        const lastCity = savedCities[savedCities.length-1]
-        handleCitySection(lastCity.lat, lastCity.lon)
-        renderCities(savedCities)
+function findLocation() {
+    if (!navigator.geolocation) {
+        console.log('Не поддерживается geolocation')
+    } else {
+        navigator.geolocation.getCurrentPosition(success)
+    }
+    async function success(position) {
+        const { latitude, longitude } = position.coords;
+        await handleCitySection(latitude, longitude);
     }
 }
 
@@ -288,18 +290,6 @@ function renderCities(cities) {
                     <img src="img/weather/${weatherImage}.svg" alt="${weatherImage}" height="41px" width="50px">
                 </div>`
         citiesWrapper.append(cityContent)
-    }
-}
-
-function findLocation() {
-    if (!navigator.geolocation) {
-        console.log('Не поддерживается geolocation')
-    } else {
-        navigator.geolocation.getCurrentPosition(success)
-    }
-    async function success(position) {
-        const { latitude, longitude } = position.coords;
-        await handleCitySection(latitude, longitude);
     }
 }
 
