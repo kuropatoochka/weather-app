@@ -6,45 +6,11 @@
     --cities-color: #483AE5;
 }
 
-html {
-    box-sizing: border-box;
-}
-
-*,
-::after,
-::before {
-    margin: 0;
-    box-sizing: inherit;
-}
-
 body {
     font-size: 16px;
     font-family: "Rubik", sans-serif;
     font-weight: 400;
-}
-
-img {
-    max-width: 100%;
-}
-
-a {
-    text-decoration: none;
     color: var(--base-color);
-}
-
-h1 {
-    font-size: 32px;
-    font-weight: 700;
-}
-
-h2 {
-    font-size: 24px;
-    font-weight: 600;
-}
-
-h3 {
-    font-size: 20px;
-    font-weight: 500;
 }
 
 .container {
@@ -65,21 +31,54 @@ h3 {
     gap: 50px;
 }
 
-.location__name,
-.date__name{
-    font-size: 20px;
-    font-family: "Rubik", sans-serif;
-    font-weight: 600;
-    color: var(--base-color);
-}
-
 .location {
     display: flex;
+    align-items: center;
     gap: 10px;
 }
 
-.hidden {
-    display: none;
+.search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search__input {
+    height: 31px;
+    width: 300px;
+    outline: none;
+    border: 2px solid var(--base-color);
+    border-radius: 12px;
+    padding-left: 35px;
+}
+
+.search__input::placeholder {
+    color: var(--secondary-background-color);
+}
+
+.search__icon {
+    position: absolute;
+    left: 10px;
+}
+
+.suggestion-list {
+    list-style-type: none;
+    padding: 0;
+    top: 40px;
+    background-color: var(--secondary-background-color);
+    position: absolute;
+    width: 100%;
+    z-index: 100;
+}
+
+.suggestion-list li {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.suggestion-list li:hover,
+.suggestion-list li.active{
+    background-color: var(--secondary-color);
 }
 
 .main__container {
@@ -242,6 +241,39 @@ body._light{
     gap: 40px;
 }
 
+.toggle-btn {
+    position: relative;
+    padding: 5px 10px 7px;
+    background-color: transparent;
+    color: var(--secondary-color);
+    font-family: "Rubik", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.toggle-btn::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    opacity: 0;
+    background-color: var(--secondary-color);
+    border-radius: 1px;
+    transition: opacity 0.2s ease;
+}
+
+.toggle-btn:hover::after {
+    opacity: 100%;
+}
+
+.toggle-btn::after._active {
+    opacity: 100%;
+}
+
 .forecast-panel__viewport {
     position: relative;
     overflow: hidden;
@@ -304,6 +336,7 @@ body._light{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    justify-content: center;
 }
 
 @media (max-width: 1150px) and (min-width: 950px) {
@@ -329,7 +362,6 @@ body._light{
     .current-weather__weather-status {
         margin-top: 5px;
         font-size: 24px;
-        font-weight: 600;
     }
 
     .current-weather__icon {
@@ -338,7 +370,6 @@ body._light{
 
     .weather-info__value {
         font-size: 20px;
-        font-weight: 500;
     }
 
     .cities__wrapper_temp {
@@ -350,14 +381,6 @@ body._light{
     body {
         background-color: var(--secondary-background-color);
         background-size: cover;
-    }
-    h1 {
-        font-size: 20px;
-        font-weight: 600;
-    }
-    h2 {
-        font-size: 16px;
-        font-weight: 500;
     }
     .location__name._dark,
     .current-weather__temp._dark,
@@ -373,15 +396,16 @@ body._light{
     .location__icon {
         display: none;
     }
+    .search__input {
+        width: 200px;
+    }
     .date {
         display: none;
     }
     .main__container {
         width: 100%;
-        display: grid;
         grid-template-columns: auto;
         grid-template-rows: 290px 240px 195px 350px;
-        grid-auto-flow: column;
         gap: 25px 0;
     }
     .current-weather {
@@ -418,6 +442,18 @@ body._light{
     }
     .forecast-panel__content::-webkit-scrollbar {
         height: 0;
+    }
+    .toggle-btn {
+        transition: color ease 0.3s;
+    }
+    .toggle-btn::after {
+        display: none;
+    }
+    .toggle-btn._light._active {
+        color: var(--base-color);
+    }
+    .toggle-btn._dark._active {
+        color: var(--secondary-background-color);
     }
     .cards {
         flex-direction: row;

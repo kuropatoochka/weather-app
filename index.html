@@ -29,13 +29,13 @@
                 <input class="search__input city-search-input" type="text" placeholder="Поиск города" style="caret-color: var(--base-color)">
                 <ul class="suggestion-list"></ul>
             </div>
-            <div class="date"><p class="date__name"></p></div>
+            <div class="date"><h3 class="date__name"></h3></div>
         </div>
     </div>
 </header>
 <main class="main">
     <div class="main__container container">
-        <div class="current-weather">
+        <section class="current-weather">
             <h3 class="current-weather__title">Погода сейчас</h3>
             <div class="current-weather__details">
                 <div class="current-weather__info">
@@ -47,8 +47,8 @@
                     <img class="current-weather__icon weatherIcon" src="" alt="">
                 </div>
             </div>
-        </div>
-        <div class="weather-info">
+        </section>
+        <section class="weather-info">
             <div class="weather-info__item">
                 <img class="weather-info__icon" src="img/wind.svg" alt="weather">
                 <div class="weather-info__data">
@@ -70,11 +70,11 @@
                     <h2 class="weather-info__value"><span class="pressure"></span></h2>
                 </div>
             </div>
-        </div>
-        <div class="cities">
+        </section>
+        <section class="cities">
             <h3 class="cities__title">Недавние города</h3>
-        </div>
-        <div class="forecast-panel">
+        </section>
+        <section class="forecast-panel">
             <div class="forecast-panel__toggle">
                 <button class="toggle-btn day-btn"><h3>Сутки</h3></button>
                 <button class="toggle-btn week-btn"><h3>5 дней</h3></button>
@@ -85,7 +85,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 </main>
 <script type="module" src="app.js"></script>

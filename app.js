@@ -1,25 +1,62 @@
-import {dateConstants, selectors, fetchCitySuggestions, loadCurrentWeather, loadForecastWeather, getWeatherIcon} from "./components/index.js";
+import {dateConstants, selectors} from "/constants/constants.js";
+import {getWeatherIcon} from "/utils/getWeatherIcon.js";
+import {debounce} from "/utils/debounce.js";
+
+import {fetchCitySuggestions, loadCurrentWeather, loadForecastWeather} from "/utils/api/apiRequest.js";
+
 let currentIcon = null
 let forecastWeatherData = null
 let currentType = 'hour'
-// Сброс активного индекса при новом вводе текста
 let activeIndex = -1
+
+document.addEventListener('DOMContentLoaded', () => {
+    findLocation()
+})
+function findLocation() {
+    if (!navigator.geolocation) {
+        error()
+    } else {
+        navigator.geolocation.watchPosition(success, error)
+    }
+    async function success(position) {
+        const { latitude, longitude } = position.coords;
+        await handleCitySection(latitude, longitude);
+    }
+    async function error() {
+        const defaultCityLat = '55.7505'
+        const defaultCityLon = '37.6175'
+        await  handleCitySection(defaultCityLat, defaultCityLon)
+    }
+}
+
+function setDate() {
+    let currentTime = new Date()
+    let currentDate = currentTime.getDate()
+    let currentDay = currentTime.getDay()
+    let currentMonth = currentTime.getMonth()
+    let nameOfDay = dateConstants.daysOfWeek[currentDay] || 'Ошибка получения дня недели'
+    let nameOfMonth = dateConstants.monthsOfYear[currentMonth] || 'Ошибка получения месяца'
+
+    return `${nameOfDay}, ${currentDate} ${nameOfMonth}`
+}
+selectors.date.textContent = setDate()
+
 selectors.citySearchInput.addEventListener("input", () => {
     const query = selectors.citySearchInput.value.trim()
     selectors.suggestionList.innerHTML = ''
     if (query.length > 1) {
-        handleCitySearch(query)
+        debounceHandleCitySearch(query)
     } else {
         selectors.suggestionList.innerHTML = ''
     }
     activeIndex = -1
 })
+const debounceHandleCitySearch = debounce(handleCitySearch, 1000)
 selectors.citySearchInput.addEventListener('keydown', (e) => {
     const items = selectors.suggestionList.querySelectorAll('li')
 
     // Если список пуст, игнорируем нажатия стрелок
     if (items.length === 0) return
-
     if (e.key === "ArrowDown") {
         activeIndex = (activeIndex + 1) % items.length
         updateActiveItem(items)
@@ -41,25 +78,24 @@ selectors.citySearchInput.addEventListener('keydown', (e) => {
         selectors.suggestionList.innerHTML = ''
     }
 })
-
 function updateActiveItem(items) {
     items.forEach((item, index) => {
         item.classList.toggle("active", index === activeIndex)
     })
 }
 
-async function handleCitySearch(query) {
-    const cities = await fetchCitySuggestions(query)
+async function handleCitySearch(foundCities) {
+    const cities = await fetchCitySuggestions(foundCities)
     if (cities.length === 0) {
         const suggestionItem = document.createElement("li")
         suggestionItem.textContent = `Город не найден`
-        selectors.suggestionList.appendChild(suggestionItem)
+        selectors.suggestionList.append(suggestionItem)
     } else {
         for (let city of cities) {
             if (city.local_names?.ru) {
                 const suggestionItem = document.createElement("li")
                 suggestionItem.textContent = `${city.local_names.ru}, ${city.country}`
-                selectors.suggestionList.appendChild(suggestionItem)
+                selectors.suggestionList.append(suggestionItem)
                 suggestionItem.onclick = () => handleCitySection(city.lat, city.lon)
             }
         }
@@ -84,14 +120,12 @@ function fetchCurrentWeatherData(data) {
     const cityLat = data.coord.lat
     const cityLon = data.coord.lon
     const cityName = data.name
-    const dataTemp = Math.round(data.main.temp)
-    const dataFeelsLike = Math.round(data.main.feels_like)
-    const dataWeatherStatus = data.weather[0].description
-    const dataIconStatus = data.weather[0].main
-    const dataIconId = data.weather[0].id
-    const dataHumidity = data.main.humidity
+    let {feels_like: dataFeelsLike, humidity: dataHumidity, pressure: dataPressure, temp: dataTemp} = data.main
+    dataFeelsLike = Math.round(dataFeelsLike)
+    dataPressure = Math.round(dataPressure * 0.75)
+    dataTemp = Math.round(dataTemp)
+    let {main: dataIconStatus, description: dataWeatherStatus, id: dataIconId} = data.weather[0]
     const dataWind = Math.round(data.wind.speed)
-    const dataPressure = Math.round(data.main.pressure * 0.75)
     selectors.locationName.textContent = cityName
     selectors.feelsLike.textContent = `${dataFeelsLike}`
     selectors.currentTemperature.textContent = `${dataTemp}`
@@ -107,34 +141,6 @@ function fetchCurrentWeatherData(data) {
     changeBackground(weatherImage)
 
     saveCityInLocalStorage(cityName, cityLat, cityLon, dataWeatherStatus, dataTemp, dataIconStatus, dataIconId)
-}
-
-function changeBackground(icon) {
-    const panel = document.querySelector('.forecast-panel')
-    const textContentChanges = document.querySelectorAll('.location__name, .current-weather__temp, .current-weather__feels-like')
-    const buttonsColor = document.querySelectorAll('.toggle-btn')
-    const body = document.body
-    const isTouchDevice = document.body.classList.contains('_touch')
-    panel.classList.remove('_light', '_dark')
-    body.classList.remove('_light', '_dark')
-    textContentChanges.forEach(text => text.classList.remove('_dark'))
-    buttonsColor.forEach(button => button.classList.remove('_dark'))
-    if (icon === 'sunny' || icon === 'cloudySunny' || icon === 'cloudy') {
-        if (isTouchDevice) {
-            body.classList.add('_light')
-            buttonsColor.forEach(button => button.classList.add('_light'))
-        } else {
-            panel.classList.add('_light')
-        }
-    } else {
-        if (isTouchDevice) {
-            body.classList.add('_dark')
-            textContentChanges.forEach(text => text.classList.add('_dark'))
-            buttonsColor.forEach(button => button.classList.add('_dark'))
-        } else {
-            panel.classList.add('_dark')
-        }
-    }
 }
 
 function switchForecastPanel(data) {
@@ -177,24 +183,6 @@ function renderWeatherCards(data, type) {
     }
 }
 
-function handleResize() {
-    const isTouchDevice = window.matchMedia('(max-width: 950px)').matches
-    document.body.classList.remove('_touch')
-    changeBackground(currentIcon)
-    renderWeatherCards(forecastWeatherData, currentType)
-    if (isTouchDevice) {
-        document.body.classList.add('_touch')
-        changeBackground(currentIcon)
-        renderWeatherCards(forecastWeatherData, currentType)
-    }
-}
-
-// Вешаем обработчик на resize
-window.addEventListener('resize', handleResize)
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', handleResize)
-
 // Функция для создания карточки погоды
 function createWeatherCard(item, type) {
     const cardWrapper = document.createElement('div')
@@ -203,57 +191,37 @@ function createWeatherCard(item, type) {
     const time = (type === 'hour')
         ? new Date(item.dt * 1000).getHours() + ':00'
         : dateConstants.dayOfWeekReduction[new Date(item.dt * 1000).getDay()]
-
-    const weatherImage = getWeatherIcon(item.weather[0].main, item.weather[0].id)
+    let {main: status, id: id, description: description} = item.weather[0]
+    let {humidity: humidity, temp: temp} = item.main
+    const weatherImage = getWeatherIcon(status, id)
     if (!isTouchDevice) {
         cardWrapper.innerHTML = `
         <div class="card__info">
             <h2 class="card__title">${time}</h2>
-            <h3 class="card__sub-title">${item.weather[0].description}</h3>
+            <p class="card__sub-title">${description}</p>
             <div class="wind">
                 <h3>${Math.round(item.wind.speed)} м/с</h3>
             </div>
             <div class="humidity">
-                <h3>${item.main.humidity} %</h3>
+                <h3>${humidity} %</h3>
             </div>
         </div>
         <div class="card__visualisation">
-            <img src="img/weather/${weatherImage}.svg" alt="${item.weather[0].main}" height="66px">
-            <h1>${Math.round(item.main.temp)} °C</h1>
+            <img src="img/weather/${weatherImage}.svg" alt="${status}" height="66px">
+            <h1>${Math.round(temp)} °C</h1>
         </div>`
     } else {
         cardWrapper.innerHTML = `
         <div class="card__info">
             <h2 class="card__title">${time}</h2>
             <div class="card__visualisation">
-                <img src="img/weather/${weatherImage}.svg" alt="${item.weather[0].main}" height="66px">
-                <h1>${Math.round(item.main.temp)} °C</h1>
+                <img src="img/weather/${weatherImage}.svg" alt="${status}" height="66px">
+                <h1>${Math.round(temp)} °C</h1>
             </div>
         </div>`
     }
 
     return cardWrapper
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    findLocation()
-})
-
-function findLocation() {
-    if (!navigator.geolocation) {
-        error()
-    } else {
-        navigator.geolocation.watchPosition(success, error)
-    }
-    async function success(position) {
-        const { latitude, longitude } = position.coords;
-        await handleCitySection(latitude, longitude);
-    }
-    async function error() {
-        const defaultCityLat = '55.7505'
-        const defaultCityLon = '37.6175'
-        await  handleCitySection(defaultCityLat, defaultCityLon)
-    }
 }
 
 //сохранение городов
@@ -286,30 +254,63 @@ function renderCities(cities) {
     const citiesWrapper = document.querySelector('.cities')
     const citiesElements = citiesWrapper.querySelectorAll('.cities__wrapper')
     citiesElements.forEach(city => city.remove())
-
     for (let city of cities) {
-        const weatherImage = getWeatherIcon(city.icon_status, city.icon_id)
+        let {name: name, temperature: temp, weather_status: weather_status, icon_status: icon_status, icon_id: icon_id} = city
+        const weatherImage = getWeatherIcon(icon_status, icon_id)
         const cityContent = document.createElement('div')
         cityContent.classList.add('cities__wrapper')
         cityContent.innerHTML = `
                 <div class="cities__wrapper_info">
-                    <h2 class="cities__name">${city.name}</h2>
-                    <h3>${city.weather_status}</h3>
+                    <h2 class="cities__name">${name}</h2>
+                    <h3>${weather_status}</h3>
                 </div>
                 <div class="cities__wrapper_temp">
-                    <h2>${city.temperature} °C</h2>
+                    <h2>${temp} °C</h2>
                     <img src="img/weather/${weatherImage}.svg" alt="${weatherImage}" height="41px" width="50px">
                 </div>`
         citiesWrapper.append(cityContent)
     }
 }
 
-// Отображение текущей даты
-let currentTime = new Date()
-let currentDate = currentTime.getDate()
-let currentDay = currentTime.getDay()
-let currentMonth = currentTime.getMonth()
-let nameOfDay = dateConstants.daysOfWeek[currentDay] || 'Ошибка получения дня недели'
-let nameOfMonth = dateConstants.monthsOfYear[currentMonth] || 'Ошибка получения месяца'
-const date = document.querySelector('.date__name')
-date.textContent = `${nameOfDay}, ${currentDate} ${nameOfMonth}`
+function handleResize() {
+    const isTouchDevice = window.matchMedia('(max-width: 950px)').matches
+    document.body.classList.remove('_touch')
+    changeBackground(currentIcon)
+    renderWeatherCards(forecastWeatherData, currentType)
+    if (isTouchDevice) {
+        document.body.classList.add('_touch')
+        changeBackground(currentIcon)
+        renderWeatherCards(forecastWeatherData, currentType)
+    }
+}
+window.addEventListener('resize', handleResize)
+document.addEventListener('DOMContentLoaded', handleResize)
+
+function changeBackground(icon) {
+    const panel = document.querySelector('.forecast-panel')
+    const textContentChanges = document.querySelectorAll('.location__name, .current-weather__temp, .current-weather__feels-like')
+    const buttonsColor = document.querySelectorAll('.toggle-btn')
+    const body = document.body
+    const isTouchDevice = document.body.classList.contains('_touch')
+    panel.classList.remove('_light', '_dark')
+    body.classList.remove('_light', '_dark')
+    textContentChanges.forEach(text => text.classList.remove('_dark'))
+    buttonsColor.forEach(button => button.classList.remove('_dark'))
+    if (icon === 'sunny' || icon === 'cloudySunny' || icon === 'cloudy') {
+        if (isTouchDevice) {
+            body.classList.add('_light')
+            buttonsColor.forEach(button => button.classList.add('_light'))
+        } else {
+            panel.classList.add('_light')
+        }
+    } else {
+        if (isTouchDevice) {
+            body.classList.add('_dark')
+            textContentChanges.forEach(text => text.classList.add('_dark'))
+            buttonsColor.forEach(button => button.classList.add('_dark'))
+        } else {
+            panel.classList.add('_dark')
+        }
+    }
+}
+
