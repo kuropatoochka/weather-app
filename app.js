@@ -1,6 +1,6 @@
-import {dateConstants, selectors} from "./constants/constants.js";
-import {getWeatherIcon} from "./utils/getWeatherIcon.js";
-import {debounce} from "./utils/debounce.js";
+import {dateConstants, selectors} from "constants/constants.js";
+import {getWeatherIcon} from "utils/getWeatherIcon.js";
+import {debounce} from "utils/debounce.js";
 
 import {fetchCitySuggestions, loadCurrentWeather, loadForecastWeather} from "/utils/api/apiRequest.js";
 
